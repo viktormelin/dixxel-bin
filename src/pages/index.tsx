@@ -1,4 +1,4 @@
-import { Box, Button, Container, Image, Text, TextInput } from '@mantine/core';
+import { Box, Button, Container, Image, MantineTheme, Text, TextInput } from '@mantine/core';
 import { type NextPage } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
@@ -33,7 +33,7 @@ const Home: NextPage = () => {
 					width: '100%',
 					display: 'flex',
 					flexDirection: 'column',
-					backgroundColor: theme.colors.black[9],
+					backgroundColor: theme.colors.gray[9],
 				})}
 			>
 				<Container>

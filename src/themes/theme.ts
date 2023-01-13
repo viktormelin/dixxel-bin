@@ -15,7 +15,7 @@ const theme: MantineThemeOverride = {
 			'#001120',
 		],
 		red: ['#ffe4e4', '#fcb9b9', '#f38c8d', '#ed5f60', '#e63234', '#cd191b', '#a01114', '#730b0e', '#470406', '#1f0000'],
-		black: [
+		gray: [
 			'#f8f0f2',
 			'#d9d9d9',
 			'#bfbfbf',

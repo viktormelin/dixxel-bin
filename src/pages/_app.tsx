@@ -12,7 +12,7 @@ import theme from '../themes/theme';
 const MyApp: AppType<{ session: Session | null }> = ({ Component, pageProps: { session, ...pageProps } }) => {
 	return (
 		<SessionProvider session={session}>
-			<MantineProvider theme={theme}>
+			<MantineProvider withGlobalStyles withNormalizeCSS theme={theme}>
 				<ModalsProvider>
 					<NotificationsProvider>
 						<Component {...pageProps} />
