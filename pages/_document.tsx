@@ -26,7 +26,7 @@ class MyDocument extends Document {
 					/>
 					<link rel='shortcut icon' href='/favicon.png' type='image/x-icon' />
 				</Head>
-				<body>
+				<body style={{ backgroundColor: '#262626' }}>
 					<Main />
 					<NextScript />
 				</body>

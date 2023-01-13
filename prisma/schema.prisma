@@ -7,7 +7,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URI")
+  url      = env("DATABASE_URL")
 }
 
 model Account {
@@ -49,6 +49,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   images        Images[]
+  codes         Codes[]
 }
 
 model VerificationToken {
@@ -69,5 +70,13 @@ model Images {
   imageSize Int       @default(0)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Codes {
+    id        String   @id @default(cuid())
+  userId    String?
+  code      String
+  createdAt DateTime @default(now())
+  user      User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 

@@ -1,155 +1,143 @@
-import { Box, Button, Image, Text, TextInput } from '@mantine/core';
+import { Box, Button, Container } from '@mantine/core';
+import { type NextPage } from 'next';
 import Head from 'next/head';
-import Link from 'next/link';
-import { useForm } from '@mantine/form';
-import { signIn, useSession } from 'next-auth/react';
+import { useCallback, useState } from 'react';
+import CodeMirror from '@uiw/react-codemirror';
+import { javascript } from '@codemirror/lang-javascript';
+import { githubDark } from '@uiw/codemirror-theme-github';
+import Icon from '../components/Icon';
+import { useSession } from 'next-auth/react';
+import UserMenu from '../components/UserMenu';
 import { useRouter } from 'next/router';
 
-export default function Home() {
+const Index: NextPage = () => {
+	const { data: sessionData } = useSession();
 	const router = useRouter();
-	const { data: session, status } = useSession();
-	if (status === 'authenticated') {
-		router.push('/dashboard');
-	}
+	const [isUploadingCode, setIsUploadingCode] = useState<boolean>(false);
+	const [codeValue, setCodeValue] = useState<string>(`class ProductCategoryRow extends React.Component {
+		render() {
+			const category = this.props.category;
+			return (
+				<tr>
+					<th colSpan="2">
+						{category}
+					</th>
+				</tr>
+			);
+		}
+	}`);
 
-	const loginForm = useForm({
-		initialValues: {
-			email: '',
-			password: '',
-		},
-		validate: {
-			email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
-			password: (value) =>
-				/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/.test(value)
-					? null
-					: 'Password must contain at least one letter, one number and be 8 characters minimum',
-		},
-	});
+	const onChange = useCallback((value: string) => {
+		setCodeValue(value);
+	}, []);
+
+	const onShare = async () => {
+		if (codeValue && codeValue.length > 0) {
+			setIsUploadingCode(true);
+			const body = JSON.stringify(codeValue);
+			await fetch(`/api/code/share`, { method: 'POST', body }).then((res) =>
+				res.json().then((data) => router.push(`/view/${data.id}`))
+			);
+		}
+	};
+
 	return (
 		<>
 			<Head>
-				<title>dixxel.io - Images</title>
-				<meta name='description' content='Upload and share images, powered by dixxel.io' />
+				<title>dixxel.io - Bin</title>
+				<meta name='description' content='Write and share code' />
 				<link rel='icon' href='/favicon.ico' />
 			</Head>
-
 			<Box
 				component='main'
-				sx={{
-					height: '100vh',
-					width: '100%',
-					display: 'flex',
-				}}
+				// sx={(theme) => ({
+				// 	backgroundColor: theme.colors.gray[9],
+				// })}
 			>
-				{/* <Link href='map'>Goto Map</Link> */}
-				<Box
+				<Container
 					sx={{
+						height: '100vh',
 						display: 'flex',
 						flexDirection: 'column',
-						flex: '1',
-						alignItems: 'center',
-						justifyContent: 'center',
 					}}
 				>
-					<Button
+					<Box
+						component='nav'
 						sx={{
 							display: 'flex',
-							justifyContent: 'center',
-							width: '20rem',
-							marginBottom: '2rem',
+							alignItems: 'center',
+							justifyContent: 'flex-end',
+							gap: '3rem',
+							padding: '1rem',
 						}}
-						onClick={() => signIn('discord', { callbackUrl: 'http://localhost:3000/dashboard' })}
 					>
-						<Text>Continue with Discord</Text>
-					</Button>
+						<UserMenu session={sessionData} />
+					</Box>
 					<Box
 						sx={{
 							display: 'flex',
 							flexDirection: 'column',
-							alignItems: 'center',
-							gap: '1rem',
-							width: '20rem',
+							gap: '2rem',
 						}}
-						component='form'
-						onSubmit={loginForm.onSubmit((values) => console.log(values))}
 					>
-						<TextInput
-							sx={{ width: '100%' }}
-							withAsterisk
-							label='Email'
-							placeholder='your@email.com'
-							{...loginForm.getInputProps('email')}
+						<CodeMirror
+							theme={githubDark}
+							value={codeValue}
+							width='100%'
+							height='70vh'
+							extensions={[javascript({ jsx: true })]}
+							onChange={onChange}
 						/>
-						<TextInput
-							sx={{ width: '100%' }}
-							withAsterisk
-							label='Password'
-							type='password'
-							{...loginForm.getInputProps('password')}
-						/>
-						<Button disabled type='submit'>
-							Login
-						</Button>
+						<Box
+							sx={{
+								display: 'flex',
+								width: '100%',
+								justifyContent: 'center',
+								gap: '1rem',
+							}}
+						>
+							{sessionData ? (
+								<Button
+									disabled={isUploadingCode}
+									sx={{
+										padding: '0.5rem',
+									}}
+									leftIcon={<Icon icon='share' />}
+									onClick={onShare}
+								>
+									Share and Save Code
+								</Button>
+							) : null}
+							{!sessionData ? (
+								<>
+									<Button
+										disabled={isUploadingCode}
+										sx={{
+											padding: '0.5rem',
+										}}
+										leftIcon={<Icon icon='share' />}
+										onClick={onShare}
+									>
+										Share Code
+									</Button>
+									<Button
+										disabled
+										sx={{
+											padding: '0.5rem',
+										}}
+										leftIcon={<Icon icon='share' />}
+									>
+										Share and Save Code
+									</Button>
+								</>
+							) : null}
+						</Box>
 					</Box>
-					<Text
-						sx={{
-							display: 'flex',
-							alignItems: 'center',
-							justifyContent: 'center',
-							gap: '0.5rem',
-							marginTop: '1rem',
-						}}
-					>
-						Don&apos;t have an account yet?{' '}
-						<Link href='register'>
-							<Text
-								sx={{
-									fontWeight: 'bold',
-								}}
-							>
-								Create one for free
-							</Text>
-						</Link>
-					</Text>
-				</Box>
-				<Box
-					sx={(theme) => ({
-						display: 'flex',
-						alignItems: 'center',
-						justifyContent: 'center',
-						flexDirection: 'column',
-						flex: '1',
-						backgroundImage: theme.fn.gradient({ from: theme.colors.blue[7], to: theme.colors.blue[4] }),
-					})}
-				>
-					<Image
-						sx={{
-							maxWidth: '450px',
-						}}
-						src='https://imagedelivery.net/3ecvmLCFkS-FijMWb0qFvQ/aca8e9de-5742-459f-e56b-dc95c8fe0c00/w=450'
-						alt='images stacked'
-					/>
-					<Text
-						sx={{
-							display: 'flex',
-							alignItems: 'center',
-							gap: '0.5rem',
-							color: '#fff',
-						}}
-					>
-						Website created by{' '}
-						<a href='https://dixxel.io'>
-							<Image
-								sx={{
-									maxWidth: '75px',
-								}}
-								src='https://imagedelivery.net/3ecvmLCFkS-FijMWb0qFvQ/e038977e-3fa6-41c2-c272-fd5a06649b00/w=75'
-								alt='dixxel'
-							/>
-						</a>
-					</Text>
-				</Box>
+				</Container>
+				{/* <AuthShowcase /> */}
 			</Box>
 		</>
 	);
-}
+};
+
+export default Index;

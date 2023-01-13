@@ -2,22 +2,20 @@ import { Box, Button, Image, Text, TextInput } from '@mantine/core';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useForm } from '@mantine/form';
-import axios from 'axios';
 import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 
-const Register = () => {
+export default function Home() {
 	const router = useRouter();
 	// const { data: session, status } = useSession();
 	// if (status === 'authenticated') {
-	// 	router.push('/dashboard');
+	// 	router.push('/');
 	// }
 
-	const registerForm = useForm({
+	const loginForm = useForm({
 		initialValues: {
 			email: '',
 			password: '',
-			confirmPassword: '',
 		},
 		validate: {
 			email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
@@ -25,13 +23,8 @@ const Register = () => {
 				/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/.test(value)
 					? null
 					: 'Password must contain at least one letter, one number and be 8 characters minimum',
-			confirmPassword: (value) =>
-				/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/.test(value)
-					? null
-					: 'Password must contain at least one letter, one number and be 8 characters minimum',
 		},
 	});
-
 	return (
 		<>
 			<Head>
@@ -46,6 +39,7 @@ const Register = () => {
 					height: '100vh',
 					width: '100%',
 					display: 'flex',
+					backgroundColor: '#fff',
 				}}
 			>
 				{/* <Link href='map'>Goto Map</Link> */}
@@ -65,7 +59,7 @@ const Register = () => {
 							width: '20rem',
 							marginBottom: '2rem',
 						}}
-						onClick={() => signIn('discord', { callbackUrl: 'http://localhost:3000/dashboard' })}
+						onClick={() => signIn('discord', { callbackUrl: 'http://localhost:3000/' })}
 					>
 						<Text>Continue with Discord</Text>
 					</Button>
@@ -78,31 +72,24 @@ const Register = () => {
 							width: '20rem',
 						}}
 						component='form'
-						onSubmit={registerForm.onSubmit((values) => console.log(values))}
+						onSubmit={loginForm.onSubmit((values) => console.log(values))}
 					>
 						<TextInput
 							sx={{ width: '100%' }}
 							withAsterisk
 							label='Email'
 							placeholder='your@email.com'
-							{...registerForm.getInputProps('email')}
+							{...loginForm.getInputProps('email')}
 						/>
 						<TextInput
 							sx={{ width: '100%' }}
 							withAsterisk
 							label='Password'
 							type='password'
-							{...registerForm.getInputProps('password')}
-						/>
-						<TextInput
-							sx={{ width: '100%' }}
-							withAsterisk
-							label='Confirm Password'
-							type='password'
-							{...registerForm.getInputProps('confirmPassword')}
+							{...loginForm.getInputProps('password')}
 						/>
 						<Button disabled type='submit'>
-							Register
+							Login
 						</Button>
 					</Box>
 					<Text
@@ -114,14 +101,14 @@ const Register = () => {
 							marginTop: '1rem',
 						}}
 					>
-						Already have an account?{' '}
-						<Link href='/'>
+						Don&apos;t have an account yet?{' '}
+						<Link href='register'>
 							<Text
 								sx={{
 									fontWeight: 'bold',
 								}}
 							>
-								Login instead
+								Create one for free
 							</Text>
 						</Link>
 					</Text>
@@ -166,6 +153,4 @@ const Register = () => {
 			</Box>
 		</>
 	);
-};
-
-export default Register;
+}
